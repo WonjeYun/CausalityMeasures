@@ -102,7 +102,7 @@ if __name__ == "__main__":
     data = pd.read_csv(f'./data/{data_name}.csv')
     comb_list = [combs for combs in combinations(data.columns, 2)]
     lag = 1
-    method = 'transfer_ent'
+    method = 'granger'
     mpi_work(data_name, data, comb_list, lag, method)
 
 
