@@ -7,7 +7,7 @@ from dateutil.relativedelta import relativedelta
 
 import warnings
 
-from .Utils.Utils import *
+from Utils.Utils import *
 
 
 class LaggedTimeSeries():
@@ -34,13 +34,13 @@ class LaggedTimeSeries():
                        
         Returns:    -   n/a
         """        
-        self.df = sanitise(df)
+        self.df = sanitise(df) # convert to pandas dataframe
         self.axes = list(self.df.columns.values) #Variable names
 
-        self.max_lag_only = max_lag_only
+        self.max_lag_only = max_lag_only # only if applies
         if lag is not None:
-            self.t = lag
-            self.df = self.__apply_lags__()
+            self.t = lag # input variable. Number of lags to apply
+            self.df = self.__apply_lags__() # apply lag generating function
 
         if window_size is not None and window_stride is not None:
             self.has_windows = True

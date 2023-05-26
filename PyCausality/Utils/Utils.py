@@ -3,7 +3,8 @@ import numpy as np
 from numpy import ma, atleast_2d, pi, sqrt, sum, transpose
 from scipy import stats, optimize, linalg, special
 from scipy.special import gammaln, logsumexp
-from scipy._lib.six import callable, string_types
+# from scipy._lib.six import callable, string_types
+from six import callable, string_types
 from scipy.stats.mstats import mquantiles
 
 import matplotlib.pyplot as plt
@@ -370,23 +371,55 @@ class _kde_(stats.gaussian_kde):
 
         self._compute_covariance(covar)
 
-    def _compute_covariance(self, covar):
+    # def _compute_covariance(self, covar):
 
+    #     if covar is not None:
+    #         self._data_covariance = covar
+    #         self._data_inv_cov = linalg.inv(self._data_covariance)
+
+    #     self.factor = self.covariance_factor()
+    #     # Cache covariance and inverse covariance of the data
+    #     if not hasattr(self, '_data_inv_cov'):
+    #         self._data_covariance = atleast_2d(np.cov(self.dataset, rowvar=1,
+    #                                            bias=False))
+    #         self._data_inv_cov = linalg.inv(self._data_covariance)
+
+    #     self.covariance = self._data_covariance * self.factor**2
+    #     self.inv_cov = self._data_inv_cov / self.factor**2
+    #     self._norm_factor = sqrt(linalg.det(2*pi*self.covariance)) * self.n
+
+    def _compute_covariance(self, covar):
+        """Computes the covariance matrix for each Gaussian kernel using
+        covariance_factor().
+        """
         if covar is not None:
             self._data_covariance = covar
             self._data_inv_cov = linalg.inv(self._data_covariance)
-
+        
         self.factor = self.covariance_factor()
-        # Cache covariance and inverse covariance of the data
-        if not hasattr(self, '_data_inv_cov'):
-            self._data_covariance = atleast_2d(np.cov(self.dataset, rowvar=1,
-                                               bias=False))
-            self._data_inv_cov = linalg.inv(self._data_covariance)
+        # Cache covariance and Cholesky decomp of covariance
+        if not hasattr(self, '_data_cho_cov'):
+            self._data_covariance = np.atleast_2d(np.cov(self.dataset, rowvar=1,
+                                            bias=False))
+            self._data_cho_cov = linalg.cholesky(self._data_covariance,
+                                                lower=True)
 
         self.covariance = self._data_covariance * self.factor**2
-        self.inv_cov = self._data_inv_cov / self.factor**2
-        self._norm_factor = sqrt(linalg.det(2*pi*self.covariance)) * self.n
+        self.cho_cov = (self._data_cho_cov * self.factor).astype(np.float64)
+        self.log_det = 2*np.log(np.diag(self.cho_cov
+                                        * np.sqrt(2*np.pi))).sum()
 
+    @property
+    def inv_cov(self):
+        # Re-compute from scratch each time because I'm not sure how this is
+        # used in the wild. (Perhaps users change the `dataset`, since it's
+        # not a private attribute?) `_compute_covariance` used to recalculate
+        # all these, so we'll recalculate everything now that this is a
+        # a property.
+        self.factor = self.covariance_factor()
+        self._data_covariance = np.atleast_2d(np.cov(self.dataset, rowvar=1,
+                                        bias=False, aweights=self.weights))
+        return linalg.inv(self._data_covariance) / self.factor**2
 
 ##############################################################################################################
 ###   U T I L I T Y    F U N C T I O N S 
