@@ -113,7 +113,7 @@ if __name__ == "__main__":
     comb_bi_name = gen_comb_bi_name(comb_list)
     data_comb_list = np.array([data[[comb_list[i][0], comb_list[i][1]]].to_numpy() for i in range(len(comb_list))])
     lag = 1
-    method = 'granger'
+    method = 'transfer_ent'
     mpi_work(data_name, data, comb_list, comb_bi_name, data_comb_list, lag, method)
 
 
