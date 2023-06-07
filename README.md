@@ -23,22 +23,33 @@ One package that has implemented information theory causality measure is *PyCaus
 ## Performance
 The performance testing would be performed on two datasets. First, the test data which is presented in the original package. Second the ‘return_pre_brexit.csv’ data, which is the exchange rate data for 36 countries from Jan 2016 to Jun 2016.
 1. Using the *test_data.csv*
+2. Datasize = [540, 4]
 * The performance for calculating Granger causality 
-* Performance from converting to *numpy and numba* using the %timeit magic function at single core, with number of shuffles 20 and single sub dataset.
-	* Original: 165 ms ± 2.26 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
-* This Project: 2.93 ms ± 23.2 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+	* Performance from converting to *numpy and numba* using the %timeit magic function at single core, with number of shuffles 20 and single sub dataset.
+		* Original: 165 ms ± 2.26 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+		* This Project: 2.93 ms ± 23.2 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
 	* Performance using MPI module.
-		* Original: 
-		* This Project: 
+		* Original: 1.0049798488616943 seconds
+		* This Project: 0.10734868049621582 seconds
 * The performance for calculating Transfer Entropy
 	* Performance using MPI module.
-		* Original
-		* This Project
+		* Original: 13.74784779548645 seconds
+		* This Project: 7.126508712768555 seconds
+
 2. Using the *return_pre_brexit.csv*
+Datasize = [125, 36]
 * The performance for calculating Granger causality
 	* Performance from converting to *numpy and numba* using the %timeit magic function at single core, with number of shuffles 20 and single sub dataset.
 		* Original: 330 ms ± 4.09 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
 		* This Project: 1.07 ms ± 2.15 µs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
+	* Performance using MPI module.
+		* Original: 208.6727259159088 seconds
+		* This Project: 0.3083817958831787 seconds
+* The performance for calculating Transfer Entropy
+	* Performance using MPI module.
+		* Original: 629.8802533149719 seconds
+		* This Project: 187.3004014492035 seconds
+* For reference, the same dataset calculated in *RTransferEntropy* took anout 30 minutes.
 
 ## Running the Code
 1. To test only the single core and single sub dataset numba usage and 20 shuffles.
